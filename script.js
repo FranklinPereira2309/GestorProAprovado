@@ -22,14 +22,14 @@ const db = {
                 if (!data.receivables) { data.receivables = []; updated = true; }
                 if (!data.customers) { data.customers = []; updated = true; }
                 if (!data.settings) { data.settings = { expirationDate: null }; updated = true; }
-                
+
                 data.products.forEach(p => {
-                    if(!p.code) {
+                    if (!p.code) {
                         p.code = Math.random().toString(36).substring(2, 10).toUpperCase();
                         updated = true;
                     }
                 });
-                if(updated) fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
+                if (updated) fs.writeFileSync(DB_FILE, JSON.stringify(data, null, 2));
             }
         } catch (error) {
             console.error('Erro ao inicializar banco:', error);
@@ -105,10 +105,10 @@ document.addEventListener('DOMContentLoaded', () => {
     initReceivablesLogic();
     initCustomersLogic();
     initGlobalExit();
-    
+
     setTimeout(() => {
         const splash = document.getElementById('splash-screen');
-        if(splash) {
+        if (splash) {
             splash.classList.add('splash-fade-out');
             setTimeout(() => {
                 splash.style.display = 'none';
@@ -150,7 +150,7 @@ function render() {
 
     loginScreen.classList.add('hidden');
     mainApp.classList.remove('hidden');
-    
+
     document.getElementById('user-name').innerText = state.currentUser.name;
     document.getElementById('user-avatar').innerText = state.currentUser.name[0].toUpperCase();
 
@@ -177,7 +177,7 @@ function initCustomersLogic() {
             e.preventDefault();
             const id = document.getElementById('customer-id').value;
             let customers = db.getTable('customers');
-            
+
             const customerData = {
                 id: id || Date.now().toString(),
                 name: document.getElementById('c-name').value,
@@ -395,8 +395,8 @@ function renderCustomers(container) {
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            ${state.customers.length === 0 ? `<tr><td colspan="5" class="py-20 text-center text-gray-300 italic">Nenhum cliente cadastrado</td></tr>` : 
-                            [...state.customers].sort((a,b) => a.name.localeCompare(b.name)).map(c => `
+                            ${state.customers.length === 0 ? `<tr><td colspan="5" class="py-20 text-center text-gray-300 italic">Nenhum cliente cadastrado</td></tr>` :
+            [...state.customers].sort((a, b) => a.name.localeCompare(b.name)).map(c => `
                                 <tr class="hover:bg-white/40 transition-colors group">
                                     <td class="px-5 py-4 truncate font-bold text-gray-800">${c.name}</td>
                                     <td class="px-4 py-4 truncate text-[11px] text-gray-500">${c.address}</td>
@@ -467,13 +467,13 @@ function renderReceivables(container) {
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-gray-100">
-                            ${state.receivables.length === 0 ? `<tr><td colspan="5" class="py-20 text-center text-gray-300 italic">Nenhum título pendente</td></tr>` : 
-                            [...state.receivables].sort((a,b) => new Date(a.dueDate) - new Date(b.dueDate)).map(r => {
-                                const today = new Date();
-                                today.setHours(0,0,0,0);
-                                const dueDate = new Date(r.dueDate + 'T00:00:00');
-                                const isExpired = dueDate < today;
-                                return `
+                            ${state.receivables.length === 0 ? `<tr><td colspan="5" class="py-20 text-center text-gray-300 italic">Nenhum título pendente</td></tr>` :
+            [...state.receivables].sort((a, b) => new Date(a.dueDate) - new Date(b.dueDate)).map(r => {
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                const dueDate = new Date(r.dueDate + 'T00:00:00');
+                const isExpired = dueDate < today;
+                return `
                                 <tr class="hover:bg-white/40 transition-colors group">
                                     <td class="px-5 py-4">
                                         <div class="text-[10px] font-bold ${isExpired ? 'text-red-500' : 'text-gray-500'}">${new Date(r.dueDate + 'T12:00:00').toLocaleDateString('pt-BR')}</div>
@@ -535,7 +535,7 @@ function renderQuotes(container) {
                                 <tr class="hover:bg-white/40 transition-colors group">
                                     <td class="px-5 py-4">
                                         <div class="text-[10px] text-gray-500 font-bold">${new Date(q.createdAt).toLocaleDateString('pt-BR')}</div>
-                                        <div class="text-[9px] text-gray-400 font-black uppercase tracking-tight">${new Date(q.createdAt).toLocaleTimeString('pt-BR', {hour: '2-digit', minute: '2-digit'})}</div>
+                                        <div class="text-[9px] text-gray-400 font-black uppercase tracking-tight">${new Date(q.createdAt).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
                                     </td>
                                     <td class="px-4 py-4">
                                         <div class="text-[11px] font-bold text-gray-800 truncate" title="${q.customer || 'Consumidor'}">${q.customer || 'Consumidor'}</div>
@@ -573,16 +573,16 @@ function renderQuotes(container) {
         document.getElementById('q-email').value = '';
         document.getElementById('q-phone').value = '';
         document.getElementById('q-validity').value = '7';
-        
+
         // Popular select de clientes no orçamento (APENAS CADASTRADOS)
         const cSelect = document.getElementById('q-customer-select');
         if (state.customers.length === 0) {
             cSelect.innerHTML = '<option value="">NENHUM CLIENTE CADASTRADO!</option>';
         } else {
-            cSelect.innerHTML = '<option value="">SELECIONE UM CLIENTE CADASTRADO...</option>' + 
+            cSelect.innerHTML = '<option value="">SELECIONE UM CLIENTE CADASTRADO...</option>' +
                 state.customers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
         }
-        
+
         cSelect.onchange = (e) => {
             const selected = state.customers.find(c => c.id === e.target.value);
             if (selected) {
@@ -598,7 +598,7 @@ function renderQuotes(container) {
 
         updateQuoteCartUI();
         const select = document.getElementById('q-product');
-        select.innerHTML = '<option value="">Selecione um produto...</option>' + 
+        select.innerHTML = '<option value="">Selecione um produto...</option>' +
             state.products.map(p => `<option value="${p.id}">${p.description} - R$ ${p.sellPrice.toFixed(2)}</option>`).join('');
         document.getElementById('quote-modal').classList.remove('hidden');
     };
@@ -606,7 +606,7 @@ function renderQuotes(container) {
 
 function initQuoteForms() {
     const btnAdd = document.getElementById('btn-add-to-quote');
-    if(btnAdd) {
+    if (btnAdd) {
         btnAdd.onclick = () => {
             const prodId = document.getElementById('q-product').value;
             const qty = parseInt(document.getElementById('q-qty').value);
@@ -624,12 +624,12 @@ function initQuoteForms() {
     }
 
     const btnSave = document.getElementById('btn-save-quote');
-    if(btnSave) {
+    if (btnSave) {
         btnSave.onclick = () => {
             const cId = document.getElementById('q-customer-select').value;
             if (!cId) return alert('Por favor, selecione um cliente cadastrado para prosseguir.');
             if (state.currentQuoteItems.length === 0) return alert('Adicione pelo menos um item à proposta.');
-            
+
             let id = document.getElementById('quote-id').value;
             let quotes = db.getTable('quotes');
             if (!id) {
@@ -753,10 +753,10 @@ window.printInventory = () => {
 
 window.printLabels = () => {
     const printArea = document.getElementById('print-area');
-    let html = `<div style="display: flex; flex-wrap: wrap; gap: 0; justify-content: flex-start;">${state.products.map(p => `<div style="width: 3cm; height: 3cm; border: 0.1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; box-sizing: border-box; overflow: hidden; page-break-inside: avoid;"><span style="font-size: 6px; font-weight: 900; text-align: center; display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${p.description.toUpperCase()}</span><svg class="barcode-item" data-value="${p.code}"></svg><span style="font-size: 7px; font-weight: 900; margin-top: 2px;">R$ ${p.sellPrice.toFixed(2)}</span></div>`).join('')}</div>`;
+    let html = `<div style="display: flex; flex-wrap: wrap; gap: 1px; justify-content: flex-start;">${state.products.map(p => `<div style="width: 3cm; height: 3cm; border: 0.1px solid #eee; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 2px; box-sizing: border-box; overflow: hidden; page-break-inside: avoid;"><span style="font-size: 7px; font-weight: 900; text-align: center; display: block; width: 100%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 2px;">${p.description.toUpperCase()}</span><svg class="barcode-item" data-value="${p.code}"></svg><span style="font-size: 10px; font-weight: 900; margin-top: 2px;">R$ ${p.sellPrice.toFixed(2)}</span></div>`).join('')}</div>`;
     printArea.innerHTML = html;
     setTimeout(() => {
-        document.querySelectorAll('.barcode-item').forEach(el => JsBarcode(el, el.dataset.value, { format: "CODE128", width: 1, height: 30, displayValue: true, fontSize: 8, margin: 0 }));
+        document.querySelectorAll('.barcode-item').forEach(el => JsBarcode(el, el.dataset.value, { format: "CODE128", width: 1, height: 30, displayValue: true, fontSize: 10, margin: 0 }));
         window.print();
     }, 100);
 };
@@ -797,7 +797,7 @@ window.printSalesReport = (start, end) => {
 
 function initForms() {
     initQuoteForms();
-    
+
     const selectPay = document.getElementById('s-pay');
     const dueContainer = document.getElementById('crediario-date-container');
     if (selectPay && dueContainer) {
@@ -815,20 +815,20 @@ function initForms() {
     const calc = () => {
         const buy = parseFloat(document.getElementById('p-buy').value) || 0;
         const margin = parseFloat(document.getElementById('p-margin').value) || 0;
-        const sell = buy * (1 + margin/100);
+        const sell = buy * (1 + margin / 100);
         const sellDisplay = document.getElementById('p-sell-display');
-        if(sellDisplay) sellDisplay.innerText = `R$ ${sell.toFixed(2)}`;
+        if (sellDisplay) sellDisplay.innerText = `R$ ${sell.toFixed(2)}`;
     };
-    
-    if(document.getElementById('p-buy')) document.getElementById('p-buy').oninput = calc;
-    if(document.getElementById('p-margin')) document.getElementById('p-margin').oninput = calc;
+
+    if (document.getElementById('p-buy')) document.getElementById('p-buy').oninput = calc;
+    if (document.getElementById('p-margin')) document.getElementById('p-margin').oninput = calc;
 
     document.querySelectorAll('.close-modal').forEach(b => b.onclick = () => {
         document.querySelectorAll('.fixed.inset-0.z-\\[6000\\], .fixed.inset-0.z-\\[7000\\], .fixed.inset-0.z-\\[7500\\], .fixed.inset-0.z-\\[8000\\]').forEach(m => m.classList.add('hidden'));
     });
 
     const pForm = document.getElementById('product-form');
-    if(pForm) {
+    if (pForm) {
         pForm.onsubmit = (e) => {
             e.preventDefault();
             const id = document.getElementById('product-id').value;
@@ -838,10 +838,10 @@ function initForms() {
             let product;
             if (id) {
                 const existing = prods.find(p => p.id === id);
-                product = { ...existing, description: document.getElementById('p-desc').value, category: document.getElementById('p-cat').value, quantity: parseInt(document.getElementById('p-qty').value), buyPrice: buy, margin: margin, sellPrice: buy * (1 + margin/100) };
+                product = { ...existing, description: document.getElementById('p-desc').value, category: document.getElementById('p-cat').value, quantity: parseInt(document.getElementById('p-qty').value), buyPrice: buy, margin: margin, sellPrice: buy * (1 + margin / 100) };
                 prods = prods.map(p => p.id === id ? product : p);
             } else {
-                product = { id: Date.now().toString(), code: Math.random().toString(36).substring(2, 10).toUpperCase(), description: document.getElementById('p-desc').value, category: document.getElementById('p-cat').value, quantity: parseInt(document.getElementById('p-qty').value), buyPrice: buy, margin: margin, sellPrice: buy * (1 + margin/100) };
+                product = { id: Date.now().toString(), code: Math.random().toString(36).substring(2, 10).toUpperCase(), description: document.getElementById('p-desc').value, category: document.getElementById('p-cat').value, quantity: parseInt(document.getElementById('p-qty').value), buyPrice: buy, margin: margin, sellPrice: buy * (1 + margin / 100) };
                 prods.push(product);
             }
             db.updateTable('products', prods);
@@ -850,7 +850,7 @@ function initForms() {
     }
 
     const btnAddCart = document.getElementById('btn-add-to-cart');
-    if(btnAddCart) {
+    if (btnAddCart) {
         btnAddCart.onclick = () => {
             const prodId = document.getElementById('s-product').value;
             const qty = parseInt(document.getElementById('s-qty').value);
@@ -863,7 +863,7 @@ function initForms() {
     }
 
     const saleForm = document.getElementById('sale-form');
-    if(saleForm) {
+    if (saleForm) {
         saleForm.onsubmit = (e) => {
             e.preventDefault();
             if (state.currentCart.length === 0) return;
@@ -886,14 +886,14 @@ function initForms() {
                 if (p) p.quantity -= item.quantity;
             });
 
-            const trans = { 
-                id: nextId, 
+            const trans = {
+                id: nextId,
                 customer: customerName,
-                items: [...state.currentCart], 
-                totalPrice: state.currentCart.reduce((acc, i) => acc + i.total, 0), 
+                items: [...state.currentCart],
+                totalPrice: state.currentCart.reduce((acc, i) => acc + i.total, 0),
                 paymentMethod: payMethod,
                 dueDate: payMethod === 'Crediário Próprio' ? dueDate : null,
-                createdAt: new Date().toISOString() 
+                createdAt: new Date().toISOString()
             };
 
             if (payMethod === 'Crediário Próprio') {
@@ -914,7 +914,7 @@ function initForms() {
 function initAuth() {
     const authForm = document.getElementById('auth-form');
     const toggleBtn = document.getElementById('toggle-auth');
-    if(toggleBtn) {
+    if (toggleBtn) {
         toggleBtn.onclick = () => {
             state.isRegistering = !state.isRegistering;
             document.getElementById('name-field').classList.toggle('hidden', !state.isRegistering);
@@ -922,7 +922,7 @@ function initAuth() {
             authForm.querySelector('button[type="submit"]').innerText = state.isRegistering ? 'Cadastrar e Entrar' : 'Entrar';
         };
     }
-    if(authForm) {
+    if (authForm) {
         authForm.onsubmit = (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
@@ -939,14 +939,14 @@ function initAuth() {
             localStorage.setItem('active_user', JSON.stringify(state.currentUser)); render();
         };
     }
-    if(document.getElementById('logout-btn')) document.getElementById('logout-btn').onclick = () => { localStorage.removeItem('active_user'); state.currentUser = null; render(); };
+    if (document.getElementById('logout-btn')) document.getElementById('logout-btn').onclick = () => { localStorage.removeItem('active_user'); state.currentUser = null; render(); };
 }
 
 function updateCartUI() {
     const list = document.getElementById('cart-items-list');
-    if(!list) return;
+    if (!list) return;
     list.innerHTML = state.currentCart.map((item, index) => `<div class="flex flex-col border-b border-gray-100 pb-1 mb-1"><div class="flex justify-between font-bold"><span>${item.description.toUpperCase()}</span><span>R$ ${item.total.toFixed(2)}</span></div><div class="flex justify-between text-gray-400"><span>${item.quantity} un x R$ ${item.price.toFixed(2)}</span><button onclick="removeFromCart(${index})" class="text-red-400 text-[8px]">Remover</button></div></div>`).join('');
-    if(document.getElementById('cart-total-display')) document.getElementById('cart-total-display').innerText = `R$ ${state.currentCart.reduce((acc, i) => acc + i.total, 0).toFixed(2)}`;
+    if (document.getElementById('cart-total-display')) document.getElementById('cart-total-display').innerText = `R$ ${state.currentCart.reduce((acc, i) => acc + i.total, 0).toFixed(2)}`;
 }
 
 window.removeFromCart = (index) => { state.currentCart.splice(index, 1); updateCartUI(); };
@@ -955,7 +955,7 @@ function initCharts() {
     const canvas = document.getElementById('chartStock');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const dataSlice = state.products.sort((a,b) => b.quantity - a.quantity).slice(0, 10);
+    const dataSlice = state.products.sort((a, b) => b.quantity - a.quantity).slice(0, 10);
     new Chart(ctx, {
         type: 'bar',
         data: { labels: dataSlice.map(p => p.description.substring(0, 8) + '...'), datasets: [{ data: dataSlice.map(p => p.quantity), backgroundColor: '#2563eb', borderRadius: 8 }] },
@@ -980,7 +980,7 @@ function renderInventory(container) {
             </div>
         </div>
     `;
-    if(document.getElementById('btn-add-product')) document.getElementById('btn-add-product').onclick = () => { document.getElementById('product-form').reset(); document.getElementById('product-id').value = ''; document.getElementById('modal-title').innerText = 'Novo Produto'; document.getElementById('p-sell-display').innerText = 'R$ 0,00'; document.getElementById('product-modal').classList.remove('hidden'); };
+    if (document.getElementById('btn-add-product')) document.getElementById('btn-add-product').onclick = () => { document.getElementById('product-form').reset(); document.getElementById('product-id').value = ''; document.getElementById('modal-title').innerText = 'Novo Produto'; document.getElementById('p-sell-display').innerText = 'R$ 0,00'; document.getElementById('product-modal').classList.remove('hidden'); };
 }
 
 window.editProduct = (id) => {
@@ -1019,10 +1019,10 @@ function renderSales(container) {
         state.currentCart = []; updateCartUI();
         const select = document.getElementById('s-product');
         select.innerHTML = '<option value="">Selecione...</option>' + state.products.filter(p => p.quantity > 0).map(p => `<option value="${p.id}">${p.description} - R$ ${p.sellPrice.toFixed(2)}</option>`).join('');
-        
+
         // Popular select de clientes no PDV
         const sCustSelect = document.getElementById('s-customer-select');
-        sCustSelect.innerHTML = '<option value="">Consumidor Final...</option>' + 
+        sCustSelect.innerHTML = '<option value="">Consumidor Final...</option>' +
             state.customers.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
 
         document.getElementById('crediario-date-container').classList.add('hidden');
